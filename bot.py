@@ -1,32 +1,25 @@
-import asyncio
-import aiohttp
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import os
-import logging
-from datetime import datetime
-from aiogram import Bot
 
-# ================== CONFIG ==================
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-CHANNEL = os.getenv("CHANNEL")  # @air_alert_ua_online
-ALERTS_URL = "https://alerts.in.ua/alerts.json"
-CHECK_INTERVAL = 15  # seconds
-# ============================================
+# Отримуємо токен бота з Environment Variable
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
-# LOGGING
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(message)s"
-)
+if not BOT_TOKEN:
+    print("ERROR: BOT_TOKEN не задано в змінних оточення!")
+    exit(1)
 
-bot = Bot(BOT_TOKEN)
-active_regions = set()
+# Створюємо додаток бота
+app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-# DAILY STATS
-stats = {
-    "alerts": 0,
-    "uav": 0,
-    "missiles": 0,
-    "aviation": 0
-}
+# Команда /start
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Привіт! Бот запущений ✅")
 
-# ==================
+# Додаємо команду /start
+app.add_handler(CommandHandler("start", start))
+
+# Запускаємо бота
+if __name__ == "__main__":
+    print("Бот запускається...")
+    app.run_polling()
